@@ -5,18 +5,20 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.dozer.DozerBeanMapper;
+import org.springframework.context.annotation.Profile;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
 
 import it.sander.aml.domain.model.PaginationResponse;
 import it.sander.aml.domain.model.SurveyModel;
 import it.sander.aml.domain.repository.SurveyRepository;
 import it.sander.aml.infrastructure.repository.dbm.SurveyDbModel;
 
-@Component
+@Repository
+@Profile("mongo")
 public class SurveyRepositoryMongo implements SurveyRepository {
     
 	protected final DozerBeanMapper mapper = new DozerBeanMapper();

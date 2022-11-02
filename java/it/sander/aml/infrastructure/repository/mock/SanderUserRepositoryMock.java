@@ -4,8 +4,8 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Optional;
 
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Repository;
 
 import it.sander.aml.domain.model.PaginationResponse;
@@ -13,6 +13,7 @@ import it.sander.aml.domain.model.SurveyModel;
 import it.sander.aml.domain.repository.SurveyRepository;
 
 @Repository
+@Profile("mock")
 public class SanderUserRepositoryMock implements SurveyRepository {
 
 	@Override

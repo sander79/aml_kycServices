@@ -4,11 +4,12 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
-import javax.annotation.PostConstruct;
 import javax.validation.constraints.Max;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.core.Authentication;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -17,7 +18,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
-import it.sander.aml.application.AmlKycServiceApplication.SurveyRepoFactory;
 import it.sander.aml.application.rest.BaseControllerRest;
 import it.sander.aml.application.rest.ResourceNotFoundException;
 import it.sander.aml.application.rest.RestResultConditions;
@@ -33,23 +33,13 @@ import it.sander.aml.domain.repository.SurveyRepository;
   
  */
 @RestController
-@RequestMapping(value = "/surveys/v1.0")
+@RequestMapping(value = "/surveys")
 public class SurveyServiceController extends BaseControllerRest {
 	
 	private final int MAX_PAGESIZE = 25;
 	
-	//@Autowired
-	//private SurveyService surveyService;
-	
-	/* initialization block  --> */
 	@Autowired
-	SurveyRepoFactory surveyRepo;
 	private SurveyRepository repository;
-	@PostConstruct
-	private void initRepository() {
-		repository = surveyRepo.getRepository();
-	}
-	/* <--  initialization block */
     
     /**
      * 
@@ -57,7 +47,10 @@ public class SurveyServiceController extends BaseControllerRest {
      * @return All surveys
      */
     @GetMapping(path={"" , "/" }, params = { "count", "page", "size" })
-	public PaginationResponse<SurveyModel> surveys(@RequestParam("count")boolean count, @RequestParam("page")int page, @RequestParam("size") @Max(MAX_PAGESIZE) int size) {
+    @Secured("ROLE_GPR_READ")
+	public PaginationResponse<SurveyModel> surveys(Authentication auth, @RequestParam("count")boolean count, @RequestParam("page")int page, @RequestParam("size") @Max(MAX_PAGESIZE) int size) {
+    	auth.getAuthorities();
+    	
 		try {
 			return RestResultConditions.checkFound(repository.findAll(count, page, size));
 			
@@ -69,8 +62,9 @@ public class SurveyServiceController extends BaseControllerRest {
 	}
        
     @GetMapping(value = "/{id}")
+    @Secured("ROLE_GPR_READ")
     @Validated
-    public SurveyModel findById(@PathVariable("id") final Long id) {
+    public SurveyModel findById(Authentication auth, @PathVariable("id") final Long id) {
         try {
             return RestResultConditions.checkFound(repository.findById(id));
 
@@ -84,6 +78,7 @@ public class SurveyServiceController extends BaseControllerRest {
     }
     
     @GetMapping(value = "/{subjectCode}", params = { "count", "page", "size" })
+    @Secured("ROLE_GPR_READ")
     public PaginationResponse<SurveyModel> findBySubjectCode(@PathVariable("subjectCode") final String subjectCode, @RequestParam("count")boolean count, @RequestParam("page")int page, @RequestParam("size") @Max(MAX_PAGESIZE) int size) {
     	
         try {
@@ -98,6 +93,7 @@ public class SurveyServiceController extends BaseControllerRest {
     }
     
     @GetMapping(value = "/{subjectCode}", params = { "dateFrom", "dateTo", "count", "page", "size" })
+    @Secured("ROLE_GPR_READ")
     public PaginationResponse<SurveyModel> findBySubjectCode(@PathVariable("dateFrom") final Date dateFrom, @PathVariable("dateTo") final Date dateTo, 
     		@RequestParam("count")boolean count, @RequestParam("page")int page, @RequestParam("size") @Max(MAX_PAGESIZE) int size) {
         try {
