@@ -7,13 +7,23 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import springfox.documentation.builders.ApiInfoBuilder;
+import springfox.documentation.builders.PathSelectors;
 import springfox.documentation.builders.RequestHandlerSelectors;
 import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
 
 @Configuration
 public class SwaggerDocket {
-
+	
+	@Bean
+    public Docket api() { 
+        return new Docket(DocumentationType.SWAGGER_2)  
+          .select()                                  
+          .apis(RequestHandlerSelectors.any())              
+          .paths(PathSelectors.any())                          
+          .build();                                           
+    }
+/*
 	@Bean
 	public Docket swaggerSurveyApi10() {
 		return new Docket(DocumentationType.SWAGGER_2).groupName("/surveys v1.0").select()
@@ -29,7 +39,7 @@ public class SwaggerDocket {
 				.paths(regex("/surveys/v1.1.*")).build().apiInfo(new ApiInfoBuilder().version("1.1").title("surveys API")
 						.description("Documentation surveys API v1.1").build());
 	}
-
+*/
 	private Predicate<String> regex(String string) {
 		return Pattern.compile(string).asPredicate();
 	}

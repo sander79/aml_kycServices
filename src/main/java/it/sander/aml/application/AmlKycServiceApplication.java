@@ -1,37 +1,24 @@
 package it.sander.aml.application;
 
-import java.util.function.Predicate;
-import java.util.regex.Pattern;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.ApplicationContext;
+import org.springframework.boot.autoconfigure.security.oauth2.resource.OAuth2ResourceServerProperties;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.data.mongodb.config.AbstractMongoClientConfiguration;
-import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Profile;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.oauth2.server.resource.introspection.NimbusReactiveOpaqueTokenIntrospector;
+import org.springframework.security.oauth2.server.resource.introspection.ReactiveOpaqueTokenIntrospector;
 
-import com.mongodb.ConnectionString;
-import com.mongodb.MongoClientSettings;
-import com.mongodb.ReadPreference;
-import com.mongodb.client.MongoClient;
-import com.mongodb.client.MongoClients;
-
-import it.sander.aml.domain.SurveyService;
-import it.sander.aml.domain.SurveyServiceImpl;
-import it.sander.aml.domain.repository.SurveyRepository;
-import it.sander.aml.infrastructure.repository.mock.SanderUserRepositoryMock;
-import it.sander.aml.infrastructure.repository.mongo.SurveyRepositoryMongo;
-import springfox.documentation.builders.ApiInfoBuilder;
-import springfox.documentation.builders.PathSelectors;
-import springfox.documentation.builders.RequestHandlerSelectors;
-import springfox.documentation.spi.DocumentationType;
-import springfox.documentation.spring.web.plugins.Docket;
+import it.sander.aml.application.security.OktaOpaqueTokenIntrospector;
+import it.sander.aml.domain.service.SurveyService;
+import it.sander.aml.domain.service.SurveyServiceImpl;
 
 @SpringBootApplication
+//@EnableWebFluxSecurity
+@ComponentScan({"it.sander.aml"})
 public class AmlKycServiceApplication {
 
 	public static void main(String[] args) {
@@ -43,110 +30,25 @@ public class AmlKycServiceApplication {
 		return new SurveyServiceImpl();
     }  
     
-    
-    @Configuration
-    @EnableMongoRepositories
-    public class MongoClientConfiguration extends AbstractMongoClientConfiguration {
-    	
-    	@Value("${application.mode}")
-    	String mode;
-           
-        @Value("${spring.data.mongodb.uri}")
-        public String mongoUri;
+    @Bean
+    @Profile("okta")
+    public ReactiveOpaqueTokenIntrospector keycloakIntrospector(OAuth2ResourceServerProperties props) {
         
-        @Value("${spring.data.mongodb.database}")
-        public String mongoDatabase;
+        NimbusReactiveOpaqueTokenIntrospector delegate = new NimbusReactiveOpaqueTokenIntrospector(
+           props.getOpaquetoken().getIntrospectionUri(),
+           props.getOpaquetoken().getClientId(),
+           props.getOpaquetoken().getClientSecret());
         
-        @Override
-        protected String getDatabaseName() {
-            return this.mongoDatabase;
-        }
-        
-        @Override
-        public MongoClient mongoClient() {       	
-            final ConnectionString connectionString = new ConnectionString(mongoUri);
-            final MongoClientSettings mongoClientSettings = MongoClientSettings.builder()
-                .applyConnectionString(connectionString)
-                .build();
-            return MongoClients.create(mongoClientSettings);
-        }
-
-        @Override
-        protected void configureClientSettings(MongoClientSettings.Builder builder) {
-            builder
-                .applyConnectionString(new ConnectionString(mongoUri))
-                .readPreference(ReadPreference.secondary());
-        }
-        
-    	public MongoTemplate mongoTemplate() {
-    		MongoTemplate template = new MongoTemplate(mongoDbFactory());
-    		return template;
-    	}
-        
+        return new OktaOpaqueTokenIntrospector(delegate);
     }
     
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig) throws Exception {
+        return authConfig.getAuthenticationManager();
+    }
     
-    @Configuration
-	public class SurveyRepoFactory {
-
-		@Value("${application.mode}")
-		String mode;
-
-		@Autowired
-		private ApplicationContext applicationContext;
-
-		@Bean(name = "surveyRepository")
-		public SurveyRepository getRepository() {
-			SurveyRepository userRepository = null;
-
-			if (userRepository == null) {
-				if ("mock".equals(mode))
-					return new SanderUserRepositoryMock();
-
-				if ("mongo".equals(mode)) {
-					MongoClientConfiguration mongoClientConfiguration = applicationContext
-							.getBean(MongoClientConfiguration.class);
-					return new SurveyRepositoryMongo(mongoClientConfiguration.mongoTemplate());
-				}
-			}
-
-			return userRepository;
-		}
-	}
-    
-    
-    @Configuration
-    public class SwaggerDocket {
-    	
-    	@Bean
-        public Docket api() { 
-            return new Docket(DocumentationType.SWAGGER_2)  
-              .select()                                  
-              .apis(RequestHandlerSelectors.any())              
-              .paths(PathSelectors.any())                          
-              .build();                                           
-        }
-/*
-    	@Bean
-    	public Docket swaggerSurveyApi10() {
-    		return new Docket(DocumentationType.SWAGGER_2).groupName("/surveys v1.0").select()
-    				.apis(RequestHandlerSelectors.basePackage("pl.piomin.services.versioning.controller"))
-    				.paths(regex("/surveys/v1.0*")).build().apiInfo(new ApiInfoBuilder().version("1.0").title("surveys API")
-    						.description("Documentation surveys API v1.0").build());
-    	}
-
-    	@Bean
-    	public Docket swaggerPersonApi11() {
-    		return new Docket(DocumentationType.SWAGGER_2).groupName("surveys v1.1").select()
-    				.apis(RequestHandlerSelectors.basePackage("pl.piomin.services.versioning.controller"))
-    				.paths(regex("/surveys/v1.1*")).build().apiInfo(new ApiInfoBuilder().version("1.1").title("surveys API")
-    						.description("Documentation surveys API v1.1").build());
-    	}
-*/
-    	private Predicate<String> regex(String string) {
-    		return Pattern.compile(string).asPredicate();
-    	}
-
+    @Bean public BCryptPasswordEncoder bCryptPasswordEncoder() {
+        return new BCryptPasswordEncoder(); 
     }
     
 }
