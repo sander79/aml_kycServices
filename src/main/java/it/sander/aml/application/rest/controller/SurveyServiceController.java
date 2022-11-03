@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
+import io.swagger.annotations.ApiOperation;
 import it.sander.aml.application.rest.BaseControllerRest;
 import it.sander.aml.application.rest.ResourceNotFoundException;
 import it.sander.aml.application.rest.RestResultConditions;
@@ -47,6 +48,7 @@ public class SurveyServiceController extends BaseControllerRest {
      * @return All surveys
      */
     @GetMapping(path={"" , "/" }, params = { "count", "page", "size" })
+    @ApiOperation(value = "Get surveys", notes = "Get surveys, paginated")
     @Secured("ROLE_GPR_READ")
 	public PaginationResponse<SurveyModel> surveys(Authentication auth, @RequestParam("count")boolean count, @RequestParam("page")int page, @RequestParam("size") @Max(MAX_PAGESIZE) int size) {
     	auth.getAuthorities();
