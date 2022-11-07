@@ -1,4 +1,4 @@
-package it.sander.aml.application;
+package it.sander.aml;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
