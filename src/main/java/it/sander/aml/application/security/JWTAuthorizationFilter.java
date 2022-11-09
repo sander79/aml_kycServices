@@ -1,67 +1,74 @@
 package it.sander.aml.application.security;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
+import org.springframework.web.filter.GenericFilterBean;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
+import com.auth0.jwt.interfaces.DecodedJWT;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
-public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
+public class JWTAuthorizationFilter extends GenericFilterBean {
 	
-	final UserDetailsServiceImpl userDetailsService;
-	
-	public JWTAuthorizationFilter(AuthenticationManager authManager, UserDetailsServiceImpl userDetailsService) {
-        super(authManager);
-        this.userDetailsService = userDetailsService;
-    }
-
+	private final ObjectMapper mapper = new ObjectMapper();
+		
     @Override
-    protected void doFilterInternal(HttpServletRequest req,
-                                    HttpServletResponse res,
-                                    FilterChain chain) throws IOException, ServletException {
-        String header = req.getHeader(SecurityConstants.HEADER_STRING);
+    public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain)
+			throws IOException, ServletException {
+    	
+        final HttpServletRequest request = (HttpServletRequest) servletRequest;
+        final String authHeader = request.getHeader(JwtConfiguration.headerParam);
 
-        if (header == null || !header.startsWith(SecurityConstants.TOKEN_PREFIX)) {
-            chain.doFilter(req, res);
+        if (authHeader == null || !authHeader.startsWith(JwtConfiguration.prefix)) {
+        	filterChain.doFilter(request, servletResponse);
             return;
         }
-
-        Authentication authentication = getAuthentication(req);
-
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-        chain.doFilter(req, res);
+ 
+        String token = authHeader.substring(JwtConfiguration.prefix.length()+1);
+        Authentication authentication = null;
+		try {
+			authentication = getAuthentication(token);
+		} catch (Exception e) {
+	        request.setAttribute(token, authentication);
+			e.printStackTrace();
+		}
+		
+		SecurityContextHolder.getContext().setAuthentication(authentication);
+        filterChain.doFilter(request, servletResponse);
     }
 
     // Reads the JWT from the Authorization header, and then uses JWT to validate the token
-    private UsernamePasswordAuthenticationToken getAuthentication(HttpServletRequest request) {
-        String token = request.getHeader(SecurityConstants.HEADER_STRING);
+	private UsernamePasswordAuthenticationToken getAuthentication(String token) throws Exception {
 
-        if (token != null) {
-            // parse the token.
-            String user = JWT.require(Algorithm.HMAC512(SecurityConstants.SECRET.getBytes()))
-                    .build()
-                    .verify(token.replace(SecurityConstants.TOKEN_PREFIX, ""))  // check expiration
-                    .getSubject();
+		DecodedJWT decodedJWT = JWT.require(Algorithm.HMAC256(JwtConfiguration.secret)).build().verify(token);
+		String username = decodedJWT.getSubject();
+		
+		String str = decodedJWT.getClaims().get("user").toString().replace("\\", "");
+		
+		List<Map> roles = (List<Map>) mapper.readValue(str.substring(1,str.length()-1), Map.class).get("authorities");
+		
+		Collection<SimpleGrantedAuthority> authorities = new ArrayList<SimpleGrantedAuthority>();
+		for(Map r : roles) {
+			authorities.add(new SimpleGrantedAuthority(r.get("authority").toString()));
+		}
+		
+			
+		return new UsernamePasswordAuthenticationToken(username, null, authorities);
+	}
 
-            if (user != null) {
-            	UserDetails det = userDetailsService.loadUserByUsername(user);
-            	return new UsernamePasswordAuthenticationToken(user, null, det.getAuthorities());
-            }
-
-            return null;
-        }
-
-        return null;
-    }
 }

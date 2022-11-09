@@ -6,9 +6,6 @@ import org.springframework.boot.autoconfigure.security.oauth2.resource.OAuth2Res
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Profile;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.oauth2.server.resource.introspection.NimbusReactiveOpaqueTokenIntrospector;
 import org.springframework.security.oauth2.server.resource.introspection.ReactiveOpaqueTokenIntrospector;
 
@@ -19,10 +16,10 @@ import it.sander.aml.domain.service.SurveyServiceImpl;
 @SpringBootApplication
 //@EnableWebFluxSecurity
 @ComponentScan({"it.sander.aml"})
-public class AmlKycServiceApplication {
+public class AmlKycService {
 
 	public static void main(String[] args) {
-		SpringApplication.run(AmlKycServiceApplication.class, args);
+		SpringApplication.run(AmlKycService.class, args);
 	}
 	
     @Bean(name = "surveyService")
@@ -40,15 +37,6 @@ public class AmlKycServiceApplication {
            props.getOpaquetoken().getClientSecret());
         
         return new OktaOpaqueTokenIntrospector(delegate);
-    }
-    
-    @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig) throws Exception {
-        return authConfig.getAuthenticationManager();
-    }
-    
-    @Bean public BCryptPasswordEncoder bCryptPasswordEncoder() {
-        return new BCryptPasswordEncoder(); 
     }
     
 }
