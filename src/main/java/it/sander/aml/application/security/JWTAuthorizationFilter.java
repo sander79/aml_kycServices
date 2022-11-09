@@ -20,6 +20,7 @@ import org.springframework.web.filter.GenericFilterBean;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
+import com.auth0.jwt.interfaces.Claim;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -58,13 +59,11 @@ public class JWTAuthorizationFilter extends GenericFilterBean {
 		DecodedJWT decodedJWT = JWT.require(Algorithm.HMAC256(JwtConfiguration.secret)).build().verify(token);
 		String username = decodedJWT.getSubject();
 		
-		String str = decodedJWT.getClaims().get("user").toString().replace("\\", "");
-		
-		List<Map> roles = (List<Map>) mapper.readValue(str.substring(1,str.length()-1), Map.class).get("authorities");
-		
+		Claim rolesClaim = decodedJWT.getClaim("roles");
+			
 		Collection<SimpleGrantedAuthority> authorities = new ArrayList<SimpleGrantedAuthority>();
-		for(Map r : roles) {
-			authorities.add(new SimpleGrantedAuthority(r.get("authority").toString()));
+		for(String r : rolesClaim.asList(String.class)) {
+			authorities.add(new SimpleGrantedAuthority(r));
 		}
 		
 			
