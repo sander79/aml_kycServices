@@ -1,6 +1,7 @@
 package it.sander.aml.domain.model;
 
 import java.util.Date;
+import java.util.UUID;
 
 /**
  * 
@@ -8,7 +9,7 @@ import java.util.Date;
  *  
  */
 public class SurveyModel {
-    private long id;
+    private UUID id;
     
     private String group;
     private String abi;
@@ -23,7 +24,7 @@ public class SurveyModel {
     
 	public SurveyModel() {}
 	
-	public SurveyModel(long id, String group, String abi, String serviceCode, Date creationDate) {
+	public SurveyModel(UUID id, String group, String abi, String serviceCode, Date creationDate) {
 		super();
 		this.id = id;
 		this.group = group;
@@ -32,11 +33,11 @@ public class SurveyModel {
 		this.creationDate = creationDate;
 	}
 
-	public long getId() {
+	public UUID getId() {
 		return id;
 	}
 
-	public void setId(long id) {
+	public void setId(UUID id) {
 		this.id = id;
 	}
 

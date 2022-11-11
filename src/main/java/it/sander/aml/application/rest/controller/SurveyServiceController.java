@@ -25,7 +25,7 @@ import it.sander.aml.application.rest.RestResultConditions;
 import it.sander.aml.application.rest.dto.SurveyDto;
 import it.sander.aml.domain.model.PaginationResponse;
 import it.sander.aml.domain.model.SurveyModel;
-import it.sander.aml.domain.repository.SurveyRepository;
+import it.sander.aml.domain.repository.SurveyQueryRepository;
 
 /**
   
@@ -40,7 +40,7 @@ public class SurveyServiceController extends BaseControllerRest {
 	private final int MAX_PAGESIZE = 25;
 	
 	@Autowired
-	private SurveyRepository repository;
+	private SurveyQueryRepository repository;
     
     /**
      * 

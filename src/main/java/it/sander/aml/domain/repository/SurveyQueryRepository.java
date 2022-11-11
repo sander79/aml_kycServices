@@ -6,7 +6,7 @@ import java.util.Date;
 import it.sander.aml.domain.model.PaginationResponse;
 import it.sander.aml.domain.model.SurveyModel;
 
-public interface SurveyRepository {
+public interface SurveyQueryRepository {
 	
 	final String collectionName = "survey"; 
 

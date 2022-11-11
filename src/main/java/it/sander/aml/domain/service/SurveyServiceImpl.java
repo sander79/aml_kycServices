@@ -1,32 +1,70 @@
 package it.sander.aml.domain.service;
 
+import java.util.LinkedHashMap;
+import java.util.UUID;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import it.sander.aml.domain.model.PaginationResponse;
 import it.sander.aml.domain.model.SurveyModel;
-import it.sander.aml.domain.repository.SurveyRepository;
+import it.sander.aml.domain.model.SurveyResponse;
+import it.sander.aml.domain.repository.RepositoryException;
+import it.sander.aml.domain.repository.SurveyCommandRepository;
+import it.sander.aml.domain.service.TransactionService.Transaction;
 
 @Service
 public class SurveyServiceImpl implements SurveyService {
 	
+
+	
 	@Autowired
-	private SurveyRepository repository;
-
+	ValidationService validator;
+	
+	@Autowired
+	SurveyCommandRepository repository;
+	
+	@Autowired
+	TransactionService transaction;
 
 	@Override
-	public SurveyModel findById(long id) {
-		return repository.findById(id);
+	public SurveyResponse submitSurvey(SurveyModel survey) {
+		
+		UUID processId = UUID.randomUUID();
+		survey.setId(processId);
+		
+		// STEP 1 - validation
+		SurveyResponse submitResponse = this.validateSurvey(survey);	
+
+		try {
+			repository.insert(survey);
+			
+			transaction.beginTransaction(processId.toString(), Transaction.SUBMIT);
+			
+		} catch (RepositoryException e) {
+			submitResponse.addErrorItem("REPO", e.getMessage());
+		}
+		
+		return submitResponse;
+	}
+	
+	/**
+	 *  Validation 
+	 */
+	@Override
+	public SurveyResponse validateSurvey(SurveyModel survey) {
+		LinkedHashMap<String, String> validationResponse = validator.validateSurvey(survey);	
+		return new SurveyResponse(survey.getId(), validationResponse);
 	}
 
 	@Override
-	public PaginationResponse<SurveyModel> findBySubjectCode(String subjectCode, boolean count, int page, int size) {
-		return repository.findBySubjectCode(subjectCode, count, page, size);
-	}
-
-	@Override
-	public PaginationResponse<SurveyModel> findAll(boolean count, int page, int size) {
-		return repository.findAll(count, page, size);
+	public SurveyResponse confirmSurvey(SurveyModel survey) {
+		SurveyResponse response = new SurveyResponse(survey.getId(), null);
+		try {
+			repository.confirm(survey);
+		} catch (RepositoryException e) {
+			response.addErrorItem("REPO", e.getMessage());
+		}
+		return response;
 	}
 	
 }

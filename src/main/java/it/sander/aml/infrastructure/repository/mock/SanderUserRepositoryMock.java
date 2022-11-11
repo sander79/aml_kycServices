@@ -4,21 +4,22 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.UUID;
 
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Repository;
 
 import it.sander.aml.domain.model.PaginationResponse;
 import it.sander.aml.domain.model.SurveyModel;
-import it.sander.aml.domain.repository.SurveyRepository;
+import it.sander.aml.domain.repository.SurveyQueryRepository;
 
 @Repository
 @Profile("mock")
-public class SanderUserRepositoryMock implements SurveyRepository {
+public class SanderUserRepositoryMock implements SurveyQueryRepository {
 
 	@Override
 	public SurveyModel findById(Long id) {
-		return new SurveyModel(236654, "GROUP","ABI","ONLINE",GregorianCalendar.getInstance().getTime());
+		return new SurveyModel(UUID.randomUUID(), "GROUP","ABI","ONLINE",GregorianCalendar.getInstance().getTime());
 	}
 
 	@Override
@@ -27,11 +28,11 @@ public class SanderUserRepositoryMock implements SurveyRepository {
 			return  new PaginationResponse<>(5);
 		
 		List<SurveyModel> list = new LinkedList<>();
-		list.add(new SurveyModel(231337, "GROUP","ABI","ONLINE",GregorianCalendar.getInstance().getTime()));
-		list.add(new SurveyModel(229884, "GROUP","ABI","ONLINE",GregorianCalendar.getInstance().getTime()));
-		list.add(new SurveyModel(227655, "GROUP","ABI","ONLINE",GregorianCalendar.getInstance().getTime()));
-		list.add(new SurveyModel(221001, "GROUP","ABI","ONLINE",GregorianCalendar.getInstance().getTime()));
-		list.add(new SurveyModel(200422, "GROUP","ABI","ONLINE",GregorianCalendar.getInstance().getTime()));
+		list.add(new SurveyModel(UUID.randomUUID(), "GROUP","ABI","ONLINE",GregorianCalendar.getInstance().getTime()));
+		list.add(new SurveyModel(UUID.randomUUID(), "GROUP","ABI","ONLINE",GregorianCalendar.getInstance().getTime()));
+		list.add(new SurveyModel(UUID.randomUUID(), "GROUP","ABI","ONLINE",GregorianCalendar.getInstance().getTime()));
+		list.add(new SurveyModel(UUID.randomUUID(), "GROUP","ABI","ONLINE",GregorianCalendar.getInstance().getTime()));
+		list.add(new SurveyModel(UUID.randomUUID(), "GROUP","ABI","ONLINE",GregorianCalendar.getInstance().getTime()));
 		return new PaginationResponse<>(list);
 		
 	}
@@ -42,11 +43,11 @@ public class SanderUserRepositoryMock implements SurveyRepository {
 			return  new PaginationResponse<>(5);
 		
 		List<SurveyModel> list = new LinkedList<>();
-		list.add(new SurveyModel(231337, "GROUP","ABI","ONLINE",GregorianCalendar.getInstance().getTime()));
-		list.add(new SurveyModel(229884, "GROUP","ABI","ONLINE",GregorianCalendar.getInstance().getTime()));
-		list.add(new SurveyModel(227655, "GROUP","ABI","ONLINE",GregorianCalendar.getInstance().getTime()));
-		list.add(new SurveyModel(221001, "GROUP","ABI","ONLINE",GregorianCalendar.getInstance().getTime()));
-		list.add(new SurveyModel(200422, "GROUP","ABI","ONLINE",GregorianCalendar.getInstance().getTime()));
+		list.add(new SurveyModel(UUID.randomUUID(), "GROUP","ABI","ONLINE",GregorianCalendar.getInstance().getTime()));
+		list.add(new SurveyModel(UUID.randomUUID(), "GROUP","ABI","ONLINE",GregorianCalendar.getInstance().getTime()));
+		list.add(new SurveyModel(UUID.randomUUID(), "GROUP","ABI","ONLINE",GregorianCalendar.getInstance().getTime()));
+		list.add(new SurveyModel(UUID.randomUUID(), "GROUP","ABI","ONLINE",GregorianCalendar.getInstance().getTime()));
+		list.add(new SurveyModel(UUID.randomUUID(), "GROUP","ABI","ONLINE",GregorianCalendar.getInstance().getTime()));
 		return new PaginationResponse<>(list);
 	}
 
@@ -56,11 +57,11 @@ public class SanderUserRepositoryMock implements SurveyRepository {
 			return  new PaginationResponse<>(5);
 		
 		List<SurveyModel> list = new LinkedList<>();
-		list.add(new SurveyModel(231337, "GROUP","ABI","ONLINE",GregorianCalendar.getInstance().getTime()));
-		list.add(new SurveyModel(229884, "GROUP","ABI","ONLINE",GregorianCalendar.getInstance().getTime()));
-		list.add(new SurveyModel(227655, "GROUP","ABI","ONLINE",GregorianCalendar.getInstance().getTime()));
-		list.add(new SurveyModel(221001, "GROUP","ABI","ONLINE",GregorianCalendar.getInstance().getTime()));
-		list.add(new SurveyModel(200422, "GROUP","ABI","ONLINE",GregorianCalendar.getInstance().getTime()));
+		list.add(new SurveyModel(UUID.randomUUID(), "GROUP","ABI","ONLINE",GregorianCalendar.getInstance().getTime()));
+		list.add(new SurveyModel(UUID.randomUUID(), "GROUP","ABI","ONLINE",GregorianCalendar.getInstance().getTime()));
+		list.add(new SurveyModel(UUID.randomUUID(), "GROUP","ABI","ONLINE",GregorianCalendar.getInstance().getTime()));
+		list.add(new SurveyModel(UUID.randomUUID(), "GROUP","ABI","ONLINE",GregorianCalendar.getInstance().getTime()));
+		list.add(new SurveyModel(UUID.randomUUID(), "GROUP","ABI","ONLINE",GregorianCalendar.getInstance().getTime()));
 		return new PaginationResponse<>(list);
 	}
 	

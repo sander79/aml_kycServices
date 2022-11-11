@@ -14,12 +14,12 @@ import org.springframework.stereotype.Repository;
 
 import it.sander.aml.domain.model.PaginationResponse;
 import it.sander.aml.domain.model.SurveyModel;
-import it.sander.aml.domain.repository.SurveyRepository;
+import it.sander.aml.domain.repository.SurveyQueryRepository;
 import it.sander.aml.infrastructure.repository.dbm.SurveyDbModel;
 
 @Repository
 @Profile("mongo")
-public class SurveyRepositoryMongo implements SurveyRepository {
+public class SurveyRepositoryMongo implements SurveyQueryRepository {
     
 	protected final DozerBeanMapper mapper = new DozerBeanMapper();
     final MongoTemplate mongoTemplate;

@@ -2,16 +2,25 @@ package it.sander.aml.domain.service;
 
 import org.springframework.stereotype.Service;
 
-import it.sander.aml.domain.model.PaginationResponse;
 import it.sander.aml.domain.model.SurveyModel;
+import it.sander.aml.domain.model.SurveyResponse;
 
 @Service
 public interface SurveyService {
 	
-	SurveyModel findById(long id);
+	/**
+	 *   submitting a survey is a transactional process <br>
+	 *     - Validation   (KYC) <br>
+	 *     - profilation  (RPM) <br>
+	 *     - dossier management (RPM) <br>
+	 *     - Confirm	(KYC)
+    */
+	SurveyResponse submitSurvey(SurveyModel survey);
 
-	PaginationResponse<SurveyModel> findAll(boolean count, int page, int size);
-
-	PaginationResponse<SurveyModel> findBySubjectCode(String subjectCode, boolean count, int page, int size);
+	/**  Validation */
+	SurveyResponse validateSurvey(SurveyModel survey);
+	
+	/**  Confirm */
+	SurveyResponse confirmSurvey(SurveyModel survey);
 
 }
