@@ -1,9 +1,9 @@
 package it.sander.aml.domain.service.azure;
 
-import java.util.UUID;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.context.annotation.Profile;
+import org.springframework.stereotype.Service;
 
 import com.azure.core.credential.TokenCredential;
 import com.azure.core.http.policy.HttpLogDetailLevel;
@@ -23,19 +23,20 @@ import com.azure.resourcemanager.servicebus.models.ServiceBusNamespace;
 
 import it.sander.aml.domain.service.TransactionService;
 
-
+@Service
+@Profile("azure")
 public class TransactionServiceAzureServiceBus implements TransactionService {
 	
 	
 	private static final Logger log = LogManager.getLogger(TransactionServiceAzureServiceBus.class);
 	
-    final AzureProfile profile = new AzureProfile(AzureEnvironment.AZURE);
-    final TokenCredential credential;
-    final ServiceBusSenderClient sender;
+	private final AzureProfile profile = new AzureProfile(AzureEnvironment.AZURE);
+    private final TokenCredential credential;
+    private final ServiceBusSenderClient sender;
     
-    final String resourceGroup = "RG1";
-    final String namespace = "namespace";
-    final String queue = "kyc_queue";
+    private final String resourceGroup = "RG1";
+    private final String namespace = "namespace";
+    private final String queue = "kyc_queue";
 
     AzureResourceManager azureResourceManager;
     
@@ -82,7 +83,8 @@ public class TransactionServiceAzureServiceBus implements TransactionService {
 
 	@Override
 	public void notifyTransaction(String processId, TransactionState tr) {
-		ServiceBusMessage msg = new ServiceBusMessage(processId); //.setSessionId("23424");	
+		String message = processId + ";" + tr.getAction();	
+		ServiceBusMessage msg = new ServiceBusMessage(message); //.setSessionId("23424");	
 		sender.sendMessage(msg);
 	}
 

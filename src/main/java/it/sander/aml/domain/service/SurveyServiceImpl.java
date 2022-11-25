@@ -61,6 +61,9 @@ public class SurveyServiceImpl implements SurveyService {
 		SurveyResponse response = new SurveyResponse(survey.getId(), null);
 		try {
 			repository.confirm(survey);
+			
+			transaction.notifyTransaction(survey.getId().toString(), TransactionState.CONFIRMED);
+			
 		} catch (RepositoryException e) {
 			response.addErrorItem("REPO", e.getMessage());
 		}
