@@ -1,4 +1,4 @@
-package it.sander.aml.domain.service;
+package it.sander.aml.domain.service.azure;
 
 import java.util.UUID;
 
@@ -20,6 +20,8 @@ import com.azure.resourcemanager.servicebus.models.AuthorizationKeys;
 import com.azure.resourcemanager.servicebus.models.NamespaceAuthorizationRule;
 import com.azure.resourcemanager.servicebus.models.NamespaceSku;
 import com.azure.resourcemanager.servicebus.models.ServiceBusNamespace;
+
+import it.sander.aml.domain.service.TransactionService;
 
 
 public class TransactionServiceAzureServiceBus implements TransactionService {
@@ -79,21 +81,10 @@ public class TransactionServiceAzureServiceBus implements TransactionService {
     }
 
 	@Override
-	public UUID beginTransaction(String processId, Transaction tr) {
-		// TODO Auto-generated method stub
-		return null;
+	public void notifyTransaction(String processId, TransactionState tr) {
+		ServiceBusMessage msg = new ServiceBusMessage(processId); //.setSessionId("23424");	
+		sender.sendMessage(msg);
 	}
 
-	@Override
-	public UUID continueTransaction(String processId, Transaction tr) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public UUID closeTransaction(String processId, Transaction tr) {
-		// TODO Auto-generated method stub
-		return null;
-	}
 
 }

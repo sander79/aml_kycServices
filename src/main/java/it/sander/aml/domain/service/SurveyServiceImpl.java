@@ -10,7 +10,7 @@ import it.sander.aml.domain.model.SurveyModel;
 import it.sander.aml.domain.model.SurveyResponse;
 import it.sander.aml.domain.repository.RepositoryException;
 import it.sander.aml.domain.repository.SurveyCommandRepository;
-import it.sander.aml.domain.service.TransactionService.Transaction;
+import it.sander.aml.domain.service.TransactionService.TransactionState;
 
 @Service
 public class SurveyServiceImpl implements SurveyService {
@@ -38,7 +38,7 @@ public class SurveyServiceImpl implements SurveyService {
 		try {
 			repository.insert(survey);
 			
-			transaction.beginTransaction(processId.toString(), Transaction.SUBMIT);
+			transaction.notifyTransaction(processId.toString(), TransactionState.INSERTED);
 			
 		} catch (RepositoryException e) {
 			submitResponse.addErrorItem("REPO", e.getMessage());
