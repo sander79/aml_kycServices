@@ -14,6 +14,7 @@ import org.springframework.beans.factory.BeanInitializationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.core.env.Environment;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -34,6 +35,7 @@ import com.auth0.jwt.interfaces.Claim;
 import com.auth0.jwt.interfaces.DecodedJWT;
 
 @Configuration
+@Profile("jwt")
 public class JwtConfiguration {
 	
 	public static String secret;
@@ -49,6 +51,10 @@ public class JwtConfiguration {
             throw new BeanInitializationException("Cannot assign security properties. Check application.properties file");
         }
     }
+	
+	protected void configure(HttpSecurity http) throws Exception{
+        http.cors().and().csrf().disable();
+    }
     
     @Bean
     CorsConfigurationSource corsConfigurationSource() {
@@ -59,9 +65,8 @@ public class JwtConfiguration {
     
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-       	
-        http.cors().and().authorizeRequests()
-        .antMatchers("/v2/api-docs", "/configuration/**", "/swagger-resources/**", "/swagger-ui.html", "/webjars/**", "/api-docs/**").permitAll()
+        http.cors().and().csrf().disable().authorizeRequests()
+        .antMatchers("/v2/api-docs", "/configuration/**", "/swagger-resources/**", "/swagger-ui.html", "/webjars/**", "/api-docs/**", "/surveys/**").permitAll()
         .anyRequest().authenticated()
         .and()
         .addFilterBefore(new JWTAuthorizationFilter(), UsernamePasswordAuthenticationFilter.class)

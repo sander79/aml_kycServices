@@ -1,5 +1,7 @@
 package it.sander.aml.domain.service;
 
+import java.util.UUID;
+
 public interface TransactionService {
 	
 	public static enum TransactionState {
@@ -30,7 +32,7 @@ public interface TransactionService {
 		
 	}
 	
-	void notifyTransaction(String processId, TransactionState tr);
+	void notifyTransaction(UUID id, TransactionState tr);
 
 
 }

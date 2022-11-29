@@ -1,10 +1,5 @@
 package it.sander.aml.domain.service.azure;
 
-import com.azure.messaging.servicebus.ServiceBusClientBuilder;
-import com.azure.messaging.servicebus.ServiceBusReceiverAsyncClient;
-
-import reactor.core.Disposable;
-
 /**
  * 
       https://azuresdkartifacts.blob.core.windows.net/azure-sdk-for-java/staging/apidocs/com/azure/messaging/servicebus/models/ServiceBusReceiveMode.html
@@ -14,23 +9,19 @@ import reactor.core.Disposable;
  */
 
 public class AzureServiceBusReceiverClient {
-	
+/*	
 	ServiceBusReceiverAsyncClient consumer;
 	
-    final String resourceGroup = "RG1";
-    final String namespace = "namespace";
-    final String queue = "kyc_queue";
-	private final String connectionString = null;
-    
+/*    
 	public AzureServiceBusReceiverClient() {
 		consumer = new ServiceBusClientBuilder()
 			     .connectionString(connectionString)
 			     .receiver()
-			     .queueName(queue)
+			     .queueName(processorQueue)
 			     .buildAsyncClient();
 
 	}
-	
+/*	
 	public void receive() {
 		Disposable subscription = consumer.receiveMessages()
 			     .subscribe(message -> {
@@ -47,5 +38,5 @@ public class AzureServiceBusReceiverClient {
 	public void close() {
 		 consumer.close();
 	}
-
+*/
 }

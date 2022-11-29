@@ -52,7 +52,7 @@ public class SurveyWriteController extends BaseControllerRest {
     @Secured("ROLE_GPR_WRITE")
 	public @ResponseBody SurveyResponse validationSurvey(@RequestBody SurveyModel survey) {
     	
-    	return service.confirmSurvey(survey);
+    	return service.confirmSurvey(survey.getId());
 
 	}
     
@@ -66,7 +66,7 @@ public class SurveyWriteController extends BaseControllerRest {
     @Secured("ROLE_GPR_WRITE")
 	public @ResponseBody SurveyResponse confirmSurvey(@RequestBody SurveyModel survey) {
     	
-    	return service.confirmSurvey(survey);
+    	return service.confirmSurvey(survey.getId());
 
 	}
 

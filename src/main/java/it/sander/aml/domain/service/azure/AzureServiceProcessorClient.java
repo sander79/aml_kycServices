@@ -1,11 +1,13 @@
 package it.sander.aml.domain.service.azure;
 
+import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import com.azure.messaging.servicebus.ServiceBusClientBuilder;
 import com.azure.messaging.servicebus.ServiceBusErrorContext;
@@ -15,8 +17,9 @@ import com.azure.messaging.servicebus.ServiceBusProcessorClient;
 import com.azure.messaging.servicebus.ServiceBusReceivedMessage;
 import com.azure.messaging.servicebus.ServiceBusReceivedMessageContext;
 
+import it.sander.aml.application.config.AmlConfigurationError;
+import it.sander.aml.application.config.AzureAmlConfiguration;
 import it.sander.aml.domain.service.TransactionService.TransactionState;
-import it.sander.aml.infrastructure.repository.event.ServiceEvent;
 import it.sander.aml.infrastructure.repository.event.ServiceEventPublisher;
 
 /**
@@ -25,29 +28,39 @@ import it.sander.aml.infrastructure.repository.event.ServiceEventPublisher;
  *
  */
 
-@Component
-@Profile("azure")
+@Service
+@Profile("azureQueue")
 public class AzureServiceProcessorClient {
 	
 	@Autowired
 	ServiceEventPublisher publisher;
 	
+	@Autowired
+	AzureAmlConfiguration config;
+	
 	private ServiceBusProcessorClient processorClient;
 	
-    final String resourceGroup = "RG1";
-    final String namespace = "namespace";
-    final String queue = "kyc_queue";
-	private final String connectionString = null;
-    
+	@Value("${servicebus.connectionString}")
+	private String connectionString = "Endpoint=sb://servicebusaml.servicebus.windows.net/;SharedAccessKeyName=aml-servicebus;SharedAccessKey=1zykiEelm3O/mU/hEsQHublVvtnxyh9ta3bKQoTSsXo=";
 	
-	public AzureServiceProcessorClient() {
+	@Value("${servicebus.resourceGroup}")
+	private String resourceGroup;
+
+	@Value("${servicebus.namespace}")
+	private String namespace;
+	
+	@Value("${servicebus.statemachine.queue}")
+	private String stateMachineQueue = "aml_statemachine_queue";
+	
+	public AzureServiceProcessorClient() throws AmlConfigurationError {
 		CountDownLatch countdownLatch = new CountDownLatch(1);
 
 	    // Create an instance of the processor through the ServiceBusClientBuilder
 	    ServiceBusProcessorClient processorClient = new ServiceBusClientBuilder()
 	        .connectionString(connectionString)
 	        .processor()
-	        .queueName(queue)
+	        //.queueName(config.getAmlConfiguration("servicebus.statemachine.queue"))
+	        .queueName(stateMachineQueue)
 	        .processMessage(context -> processMessage(context))
 	        .processError(context -> processError(context, countdownLatch))
 	        .buildProcessorClient();
@@ -65,10 +78,17 @@ public class AzureServiceProcessorClient {
 	    String amlMessage = message.getBody().toString();
 	    String[] amlBody = amlMessage.split(";");
 	    
-	    if(amlBody[1].equals(TransactionState.MANAGED.getAction()))
-	    	publisher.publishCustomEvent(amlBody[0], amlBody[1]);
+	    TransactionState status = TransactionState.valueOf(amlBody[1]);
+	    switch(status) {
+	       case MANAGED:
+	       case PROFILED:
+	          publisher.publishCustomEvent(UUID.fromString(amlBody[0]), status);
+	          
+	       default:
+	    	   context.abandon();
+	    }
 	    
-	    context.complete();
+	    //context.complete();
 	}
 	
 	private void processError(ServiceBusErrorContext context, CountDownLatch countdownLatch) {

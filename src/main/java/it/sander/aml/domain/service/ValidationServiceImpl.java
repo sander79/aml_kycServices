@@ -2,8 +2,11 @@ package it.sander.aml.domain.service;
 
 import java.util.LinkedHashMap;
 
+import org.springframework.stereotype.Service;
+
 import it.sander.aml.domain.model.SurveyModel;
 
+@Service
 public class ValidationServiceImpl implements ValidationService {
 
 	@Override

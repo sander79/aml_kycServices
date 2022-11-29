@@ -1,5 +1,7 @@
 package it.sander.aml.domain.service;
 
+import java.util.UUID;
+
 import org.springframework.stereotype.Service;
 
 import it.sander.aml.domain.model.SurveyModel;
@@ -21,6 +23,6 @@ public interface SurveyService {
 	SurveyResponse validateSurvey(SurveyModel survey);
 	
 	/**  Confirm */
-	SurveyResponse confirmSurvey(SurveyModel survey);
+	SurveyResponse confirmSurvey(UUID id);
 
 }

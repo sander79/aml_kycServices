@@ -1,27 +1,32 @@
 package it.sander.aml.application.event;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
 
 import it.sander.aml.domain.service.SurveyService;
 import it.sander.aml.infrastructure.repository.event.ServiceEvent;
-import it.sander.aml.infrastructure.repository.event.ServiceEventPublisher;
+import it.sander.aml.infrastructure.repository.event.ServiceEventListener;
 
 @Component
-public class eventController implements ApplicationListener<ServiceEvent> {
+public class eventController extends ServiceEventListener {
 	
 	@Autowired
 	SurveyService service;
-	
-	@Autowired
-	ServiceEventPublisher publisher;
 
 	@Override
 	public void onApplicationEvent(ServiceEvent event) {
-		System.out.println("Received spring custom event - " + event.getMessage());
+		System.out.println("Received spring custom event - " + event.getStatus());
 		
-		publisher.
+	    switch(event.getStatus()) {
+	       case MANAGED:
+	    	   service.confirmSurvey(event.getId());
+		          break;
+	       case PROFILED:
+	          break;
+	          
+	       default:
+	    	   
+	    }
 		
 	}
 

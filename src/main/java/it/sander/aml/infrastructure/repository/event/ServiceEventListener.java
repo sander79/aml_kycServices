@@ -1,12 +1,13 @@
 package it.sander.aml.infrastructure.repository.event;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
-import org.springframework.stereotype.Component;
 
-@Component
-public class ServiceEventListener implements ApplicationListener<ServiceEvent> {
-	    @Override
-	    public void onApplicationEvent(ServiceEvent event) {
-	        System.out.println("Received spring custom event - " + event.getMessage());
-	    }
-	}
+public abstract class ServiceEventListener implements ApplicationListener<ServiceEvent> {
+	
+	@Autowired
+	ServiceEventPublisher publisher;
+	
+	@Override
+	public abstract void onApplicationEvent(ServiceEvent event);
+}

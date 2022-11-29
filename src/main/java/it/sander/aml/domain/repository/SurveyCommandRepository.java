@@ -10,6 +10,6 @@ public interface SurveyCommandRepository {
 
 	UUID insert(SurveyModel survey) throws RepositoryException;
 
-	boolean confirm(SurveyModel survey) throws RepositoryException;
+	boolean confirm(UUID id) throws RepositoryException;
 
 }

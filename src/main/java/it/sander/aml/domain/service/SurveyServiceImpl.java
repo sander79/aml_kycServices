@@ -29,8 +29,8 @@ public class SurveyServiceImpl implements SurveyService {
 	@Override
 	public SurveyResponse submitSurvey(SurveyModel survey) {
 		
-		UUID processId = UUID.randomUUID();
-		survey.setId(processId);
+		UUID id = UUID.randomUUID();
+		survey.setId(id);
 		
 		// STEP 1 - validation
 		SurveyResponse submitResponse = this.validateSurvey(survey);	
@@ -38,10 +38,10 @@ public class SurveyServiceImpl implements SurveyService {
 		try {
 			repository.insert(survey);
 			
-			transaction.notifyTransaction(processId.toString(), TransactionState.INSERTED);
+			transaction.notifyTransaction(id, TransactionState.INSERTED);
 			
 		} catch (RepositoryException e) {
-			submitResponse.addErrorItem("REPO", e.getMessage());
+			submitResponse.addErrorItem("SERVICE", e.getMessage());
 		}
 		
 		return submitResponse;
@@ -57,15 +57,15 @@ public class SurveyServiceImpl implements SurveyService {
 	}
 
 	@Override
-	public SurveyResponse confirmSurvey(SurveyModel survey) {
-		SurveyResponse response = new SurveyResponse(survey.getId(), null);
+	public SurveyResponse confirmSurvey(UUID id) {
+		SurveyResponse response = new SurveyResponse(id, null);
 		try {
-			repository.confirm(survey);
+			repository.confirm(id);
 			
-			transaction.notifyTransaction(survey.getId().toString(), TransactionState.CONFIRMED);
+			transaction.notifyTransaction(id, TransactionState.CONFIRMED);
 			
 		} catch (RepositoryException e) {
-			response.addErrorItem("REPO", e.getMessage());
+			response.addErrorItem("SERVICE", e.getMessage());
 		}
 		return response;
 	}

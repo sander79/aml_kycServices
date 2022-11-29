@@ -14,8 +14,8 @@ import it.sander.aml.domain.model.SurveyModel;
 import it.sander.aml.domain.repository.SurveyQueryRepository;
 
 @Repository
-@Profile("mock")
-public class SanderUserRepositoryMock implements SurveyQueryRepository {
+@Profile("mockRepo")
+public class SurveyQueryRepositoryMock implements SurveyQueryRepository {
 
 	@Override
 	public SurveyModel findById(Long id) {
