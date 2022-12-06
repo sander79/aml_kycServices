@@ -4,8 +4,9 @@ import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
+import javax.annotation.PostConstruct;
+
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
@@ -17,8 +18,8 @@ import com.azure.messaging.servicebus.ServiceBusProcessorClient;
 import com.azure.messaging.servicebus.ServiceBusReceivedMessage;
 import com.azure.messaging.servicebus.ServiceBusReceivedMessageContext;
 
+import it.sander.aml.application.config.AmlConfiguration;
 import it.sander.aml.application.config.AmlConfigurationError;
-import it.sander.aml.application.config.AzureAmlConfiguration;
 import it.sander.aml.domain.service.TransactionService.TransactionState;
 import it.sander.aml.infrastructure.repository.event.ServiceEventPublisher;
 
@@ -35,32 +36,24 @@ public class AzureServiceProcessorClient {
 	@Autowired
 	ServiceEventPublisher publisher;
 	
-	@Autowired
-	AzureAmlConfiguration config;
+	@Autowired	
+	AmlConfiguration config;
 	
 	private ServiceBusProcessorClient processorClient;
-	
-	@Value("${servicebus.connectionString}")
-	private String connectionString = "Endpoint=sb://servicebusaml.servicebus.windows.net/;SharedAccessKeyName=aml-servicebus;SharedAccessKey=1zykiEelm3O/mU/hEsQHublVvtnxyh9ta3bKQoTSsXo=";
-	
-	@Value("${servicebus.resourceGroup}")
-	private String resourceGroup;
-
-	@Value("${servicebus.namespace}")
-	private String namespace;
-	
-	@Value("${servicebus.statemachine.queue}")
-	private String stateMachineQueue = "aml_statemachine_queue";
-	
-	public AzureServiceProcessorClient() throws AmlConfigurationError {
+		
+	@PostConstruct
+	private void init() throws AmlConfigurationError {
 		CountDownLatch countdownLatch = new CountDownLatch(1);
+		
+    	String connectionString = config.getAmlConfiguration(AmlConfiguration.SERVICEBUS_CONNECTIONSTRING);
+    	String processorQueue = config.getAmlConfiguration(AmlConfiguration.SERVICEBUS_PROCESSOR_QUEUE);   
 
 	    // Create an instance of the processor through the ServiceBusClientBuilder
 	    ServiceBusProcessorClient processorClient = new ServiceBusClientBuilder()
 	        .connectionString(connectionString)
 	        .processor()
 	        //.queueName(config.getAmlConfiguration("servicebus.statemachine.queue"))
-	        .queueName(stateMachineQueue)
+	        .queueName(processorQueue)
 	        .processMessage(context -> processMessage(context))
 	        .processError(context -> processError(context, countdownLatch))
 	        .buildProcessorClient();

@@ -50,8 +50,7 @@ public class SurveyServiceController extends BaseControllerRest {
     @GetMapping(path={"" , "/" }, params = { "count", "page", "size" })
     @ApiOperation(value = "Get surveys", notes = "Get surveys, paginated")
     @Secured("ROLE_GPR_READ")
-	public PaginationResponse<SurveyModel> surveys(Authentication auth, @RequestParam("count")boolean count, @RequestParam("page")int page, @RequestParam("size") @Max(MAX_PAGESIZE) int size) {
-    	auth.getAuthorities();
+	public PaginationResponse<SurveyModel> surveys(@RequestParam("count")boolean count, @RequestParam("page")int page, @RequestParam("size") @Max(MAX_PAGESIZE) int size) {
     	
 		try {
 			return RestResultConditions.checkFound(repository.findAll(count, page, size));

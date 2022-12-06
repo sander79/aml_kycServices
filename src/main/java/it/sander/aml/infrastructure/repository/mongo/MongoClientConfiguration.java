@@ -15,7 +15,7 @@ import com.mongodb.client.MongoClients;
 
 @Configuration
 @EnableMongoRepositories
-@Profile("mongo")
+@Profile("mongoRepo")
 public class MongoClientConfiguration extends AbstractMongoClientConfiguration {
        
     @Value("${spring.data.mongodb.uri}")

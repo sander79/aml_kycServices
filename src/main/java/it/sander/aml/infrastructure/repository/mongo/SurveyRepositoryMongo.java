@@ -18,7 +18,7 @@ import it.sander.aml.domain.repository.SurveyQueryRepository;
 import it.sander.aml.infrastructure.repository.dbm.SurveyDbModel;
 
 @Repository
-@Profile("mongo")
+@Profile("mongoRepo")
 public class SurveyRepositoryMongo implements SurveyQueryRepository {
     
 	protected final DozerBeanMapper mapper = new DozerBeanMapper();

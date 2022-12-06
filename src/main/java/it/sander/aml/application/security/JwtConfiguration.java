@@ -66,7 +66,7 @@ public class JwtConfiguration {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.cors().and().csrf().disable().authorizeRequests()
-        .antMatchers("/v2/api-docs", "/configuration/**", "/swagger-resources/**", "/swagger-ui.html", "/webjars/**", "/api-docs/**", "/surveys/**").permitAll()
+        .antMatchers("/v2/api-docs", "/configuration/**", "/swagger-resources/**", "/swagger-ui/**", "/webjars/**", "/api-docs/**").permitAll()
         .anyRequest().authenticated()
         .and()
         .addFilterBefore(new JWTAuthorizationFilter(), UsernamePasswordAuthenticationFilter.class)
